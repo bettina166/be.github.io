@@ -1,0 +1,40 @@
+1、使用mybatis完成单张表的CRUD：
+	增
+	删
+	改
+	查一个
+	查所有
+	
+2、配置文件的名字随意，只要放到类路径下即可。
+	mybatis-config.xml
+	SqlMapper.xml
+	
+3、一般情况下，连接数据库的信息最好是单独配置到属性文件中。这样用户修改的时候会比较方便。
+	为了提高用户的体验，建议单独配置一个资源文件/属性文件。
+	
+	- 在类的根路径下，新建一个jdbc.properties文件。配置连接数据库的信息。
+	
+	- 然后在核心配置文件引入该资源文件。
+		<properties resource="jdbc.properties"/>
+	
+	- 使用：<property name="driver" value="${jdbc.driver}" />语法。
+		注意：${jdbc.driver}这个不是EL表达式，是mybatis中自定制的语法机制。
+		${属性文件中的key}
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

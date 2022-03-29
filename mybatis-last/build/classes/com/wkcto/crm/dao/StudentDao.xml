@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.wkcto.crm.dao.StudentDao">
+
+	<select id="getAll" resultType="Student">
+		<!-- 
+		select 
+			*
+		from
+			tbl_student
+		order by
+			birth #{keywords}
+		 -->
+		<!-- 
+		select 
+			*
+		from
+			tbl_student
+		order by
+			birth ${value}
+		 -->
+		 
+		select 
+			*
+		from
+			tbl_student
+		order by
+			birth ${hehe}
+			
+	</select>
+
+	<insert id="save" parameterType="Student">
+		insert into tbl_student(id,name,birth) values(#{id},#{name},#{birth})
+	</insert>
+
+	<insert id="save2">
+		insert into tbl_student(id,name,birth) values(#{arg0},#{arg1},#{arg2})
+	</insert>
+
+	<delete id="deleteByIds">
+		delete from tbl_student where id in <!-- ('id1' , 'id2') -->
+		<foreach collection="array" open="(" close=")" separator="," item="stuId">
+		#{stuId}
+		</foreach>
+	</delete>
+	
+	<!-- 
+	<delete id="deleteByIds">
+		delete from tbl_student where id in(
+		<foreach collection="array" separator="," item="stuId">
+		#{stuId}
+		</foreach>
+		)
+	</delete>
+	 -->
+	
+	<insert id="saves" parameterType="Student">
+		insert into tbl_student
+			(id,name,birth)
+		values
+		<foreach collection="list" separator="," item="stu">
+			(#{stu.id},#{stu.name},#{stu.birth})
+		</foreach>
+	</insert>
+	
+	<select id="getTotalByCondition" parameterType="Map" resultType="Long">
+		select
+			count(*)
+		from
+			tbl_student s
+		<where>
+			<if test="name1 != null and name1 != ''">
+				and s.name like '%' #{name1} '%'
+			</if>
+			<if test="birth1 != null and birth1 != ''">
+				and s.birth = #{birth1}
+			</if>
+		</where>
+	</select>
+	
+	<select id="getDataListByCondition" parameterType="Map" resultType="Student">
+		select
+			s.*
+		from
+			tbl_student s
+		<where>
+			<if test="name1 != null and name1 != ''">
+				and s.name like '%' #{name1} '%' <!-- mybatis中的占位符#{}两边必须要有空格，不然mybatis无法识别这里有一个占位符。 -->
+			</if>
+			<if test="birth1 != null and birth1 != ''">
+				and s.birth = #{birth1}
+			</if>
+		</where>
+		order by 
+			birth desc
+		limit
+			#{startIndex} , #{pageSize1}
+	</select>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

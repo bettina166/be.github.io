@@ -1,0 +1,70 @@
+思考：JDBC开发存在哪些缺点？
+
+1、任务：从数据库当中查询所有的学生信息，将学生信息封装为学生对象，将学生对象放到List集合当中。
+
+2、准备数据库：
+	新建一个数据库：
+		create database wkcto;
+	新建一张表：学生表(tbl_student)
+		create table tbl_student(
+			id varchar(255),
+			name varchar(255),
+			birth char(10)
+		);
+	模拟数据：
+		insert into tbl_student(id,name,birth) values('1' , 'zhangsan' , '1980-10-11');
+		insert into tbl_student(id,name,birth) values('2' , 'lisi' , '1980-10-12');
+		insert into tbl_student(id,name,birth) values('3' , 'wangwu' , '1980-10-13');
+		commit;
+		select * from tbl_student;
+		
+3、编写JDBC代码。
+	* 准备javabean：Student
+
+4、JDBC开发的缺点？
+
+	* 缺点一：重复代码太多，这样会让开发效率降低。（比较繁琐，有一些代码是“没有必要的重复”）
+		while(rs.next()){
+			...
+			// 反复的调用同一个方法：String str = rs.getString("只有这里不同")
+			String id = rs.getString("id");
+			String name = rs.getString("name");
+			String birth = rs.getString("birth");
+			
+			Student student = new Student();
+			// 反复的调用同一个方法：setXxx(xx)
+			student.setId(id);
+			student.setName(name);
+			student.setBirth(birth);
+			...
+		}
+		
+		以上的代码中反复的从结果集中取数据，反复的调用对象的set方法给对象的属性赋值，
+		这个过程完全可以使用反射机制替代，mybatis框架就是别人提前写好的java代码，
+		这个mybatis框架封装了JDBC代码，mybatis框架当中使用了反射机制，帮助我们自动
+		创建java对象，自动给java对象的属性赋值，以上的代码在mybatis中不需要编写了。
+		
+	* 缺点二：JDBC开发当中sql语句是编写在java程序当中的，sql语句不支持配置。sql语句
+	可能后期需要调优，sql语句被修改的概率还是很高的。在java程序中编写sql语句，后期修改
+	sql语句的时候，需要重新修改java源代码，源代码的修改会导致重新编译/重新部署等操作。
+	并且修改java源代码已经违背了开闭原则：OCP。
+		互联网分布式架构方面的项目，并发量很大，系统需要不断的优化，各方面优化，其中有一条
+		非常重要的优化就是sql优化。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

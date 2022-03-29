@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<!-- 先不要管 namespace，随意编写一个。-->
+<mapper namespace="fdsaklfjdklsajfkdls">
+	
+	<!-- 查询语句，查询所有的学生 -->
+	<!-- id具有唯一性，代表了这条sql语句，将来这个id是需要“拷贝”到java程序当中的。 -->
+	<!-- 思考：我们程序员需要告诉mybatis框架什么信息，mybatis才能自动创建对象，并且自动将查询的结果集放到java对象的对应属性上。 -->
+	<!-- 需要告诉mybatis，最终封装的java对象的类型。 -->
+	<!-- 需要告诉mybatis，最终查询出的结果集赋值到javabean的哪个属性上面，怎么告诉mybatis呢？ 
+	查询结果集的列名要和javabean的属性名对应上，不对应的时候使用as关键字起别名。-->
+	<select id="getAll" resultType="com.wkcto.mybatis.domain.Student">
+		select
+			id as sid, name as sname , birth as sbirth
+		from
+			tbl_student
+	</select>
+	
+</mapper>

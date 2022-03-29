@@ -1,0 +1,174 @@
+关于mybatis当中的#{}和${}
+
+	1、回顾JDBC中的Statement和PreparedStatement有什么区别？
+	
+		Statement：
+			...
+			String username = "admin"; // 用户输入的信息
+			String password = "123"; // 用户输入的信息
+			Statement stmt = conn.createStatement();
+			// 先进行sql语句的拼接
+			String sql = "select * from tbl_user username = '"+username+"' and password = '"+password+"'";
+			// 执行到这里sql语句被发送到DBMS数据库管理系统当中，DBMS负责将该sql语句进行编译。
+			rs = stmt.executeQuery(sql);
+			if(rs.next()){
+				// 登录成功了。
+			}
+			...		
+			以上存在的问题是什么？
+				sql注入现象。
+				
+			为什么会存在sql注入呢，导致sql注入的根本原因是什么？
+				用户输入的信息中含有sql语句的关键字，并且这些关键字参加了sql语句的“编译”过程。
+				导致原sql语句的原意被扭曲了。（根本原因：用户提供的信息被编译进去了。）
+				
+			Statement更适合什么场景下的使用？
+				凡是进行sql语句拼接的操作，都离不开Statement。
+				Statement专门用在sql语句拼接的场景下。
+			
+			京东：
+				https://list.jd.com/list.html?cat=9987,653,655&page=1&sort=sort_dredisprice_desc&trans=1&JL=4_4_0#J_main
+			java代码：
+				String sort = request.getParameter("sort");
+				String sql = "select * from tbl_product order by price";
+				String order = "";
+				if("sort_dredisprice_desc".equals(sort)){
+					// 降序
+					order = "desc";
+				}else if("sort_dredisprice_asc".equals(sort)){
+					// 升序
+					order = "asc";
+				}else{
+					// 非法...
+				}
+				
+		PreparedStatement:
+			...
+			String username = "admin"; // 用户输入的信息
+			String password = "123"; // 用户输入的信息
+			String sql = "select * from tbl_user username = ? and password = ?";
+			// 程序执行到此处会对以上的sql语句进行一次编译。
+			PreparedStatement ps = conn.prepareStatement(sql);
+			// 给?占位符“传值”
+			ps.setString(1 , username);
+			ps.setString(2 , password); // 传值，就算有关键字，不参与编译，充其量也只是一个值。
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				// 登录成功了。
+			}
+			...		
+			PreparedStatement只适合于给sql语句的占位符传值，不能拼接sql语句。
+			
+			...
+			String sql = "select * from tbl_user where age = ?";
+			ps.setInt(1 , 30);
+			...
+			
+		Statement: 先进行sql语句的拼接，然后再进行编译。
+		PreparedStatement:先进行sql语句的预编译，然后再给sql语句传值。
+		
+	2、#{}和${}在mybatis当中有什么区别？
+		#{}对应的是：PreparedStatement，#{}占位符主要用来完成sql语句传值操作的。
+		${}对应的是：Statement，${}占位符主要用来完成sql语句拼接操作的。
+		
+		${} 先进行sql语句的拼接，然后再编译。
+		#{} 先进行sql语句框架的编译，然后再传值。
+	
+	3、可以使用一个案例：升序/降序。
+		注意：
+			select 
+				*
+			from
+				tbl_student
+			order by
+				birth ${value}
+		
+		${这个位置不能随意编写} 固定写value
+		除非在dao接口的方法参数上使用@Param注解标注。例如：@Param("keywords")
+		那么sql语句才能这样写：
+			select 
+				*
+			from
+				tbl_student
+			order by
+				birth ${keywords}
+		
+		这种使用@Param注解的方式适合于多个参数。当一个sql语句多个位置需要进行拼接的话，可以考虑使用@Param注解。
+				
+		
+关于mybatis中的核心配置文件：mybatis-config.xml
+	
+	<configuration>
+	
+		<!--引入外部独立的资源文件-->
+		<properties resource="jdbc.properties"/>
+		
+		<!--别名-->
+		<typeAliases>
+			<package name="com.wkcto.crm.domain"/>
+		</typeAliases>
+		
+		<!--mybatis的环境,mybatis环境主要是两个：一个是开发环境development，一个是生产环境production。-->
+		<environments default="development"> <!--指定mybatis的默认环境。-->
+		
+			<!-- 当程序员调整“开发环境”和“生成环境”，mybatis会进行自我调整，自我优化。-->
+			<!--开发环境：程序员还在编码阶段，测试阶段等。没有到线上。属于开发过程。-->
+			<environment id="development">
+				<!--配置事务管理器：JDBC|MANAGED
+				JDBC:使用jdbc的事务机制，使用mybatis自带的事务管理器，openSession()方法调用，开启事务，自动提交机制关闭。
+				MANAGED:表示事务的管理交给其他容器来负责，mybatis则不再管理事务。例如: Spring框架对事务的管理非常好，所以在以后框架
+				集成的时候，不会使用mybatis自带的事务管理器，会交给Spring来管理事务，这个时候，必须是：MANAGED
+				-->
+				<transactionManager type="JDBC" />
+				<!--配置数据源/连接池：UNPOOLED|POOLED|JNDI-->
+				<!--
+					UNPOOLED：不使用任何连接池技术。
+					POOLED：使用mybatis自带的连接池技术。（mybatis自带有连接池。）
+					JNDI:使用第三方的数据库连接池技术，例如：dbcp,c3p0,druid等。 
+				-->
+				<dataSource type="POOLED">
+					<property name="driver" value="${jdbc.driver}" />
+					<property name="url" value="${jdbc.url}" />
+					<property name="username" value="${jdbc.user}" />
+					<property name="password" value="${jdbc.password}" />
+				</dataSource>
+			</environment>
+			
+			<!--生产环境：线上，软件已经投入生产了，给客户已经带来收益了。-->
+			<environment id="production">
+				<transactionManager type="JDBC" />
+				<dataSource type="POOLED">
+					<property name="driver" value="${jdbc.driver}" />
+					<property name="url" value="${jdbc.url}" />
+					<property name="username" value="${jdbc.user}" />
+					<property name="password" value="${jdbc.password}" />
+				</dataSource>
+			</environment>
+			
+		</environments>
+		
+		<!--sql映射文件的路径-->
+		<mappers>
+			<package name="com.wkcto.crm.dao"/>
+		</mappers>
+		
+	</configuration>
+	
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		

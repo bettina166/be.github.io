@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="fdsjaifldjkslafjdklsafjkd">
+
+	<!-- 
+		parameterType 属性用来专门给sql语句的占位符传值的。
+		翻译为：参数类型。
+		javabean给占位符传值的时候，程序员需要告诉mybatis javabean的哪个属性传到哪个占位符上。
+		mybatis中的占位符不能使用?，必须使用#{}，并且#{这里需要编写javabean的属性名}
+	 -->
+	<insert id="save" parameterType="com.wkcto.mybatis.domain.Student">
+		insert into tbl_student
+			(id , name , birth)
+		values
+			(#{stuId} , #{stuName} , #{stuBirth})
+	</insert>
+	
+	<update id="update" parameterType="com.wkcto.mybatis.domain.Student" >
+		update tbl_student set
+			name = #{stuName} , birth = #{stuBirth}
+		where
+			id = #{stuId}
+	</update>
+	
+	<!-- parameterType是参数类型，专门负责给sql语句传值 -->
+	<!-- resultType是查询结果集的类型，只有在select语句中才会有。 -->
+	<!-- 
+		parameterType="简单类型"，则parameterType可以省略。
+		resultType="简单类型" 这个不能省略。
+		什么是简单类型：17个：
+			byte short int long float double boolean char
+			Byte Short Integer Long Float Double Boolean Character
+			String
+	 -->
+	<!-- 
+	<select id="getById" parameterType="java.lang.String" resultType="com.wkcto.mybatis.domain.Student">
+	 -->
+	<select id="getById" resultType="com.wkcto.mybatis.domain.Student">
+		select 
+			id as stuId, name as stuName, birth as stuBirth <!-- 列名和javabean的属性名必须一致。不一致，使用别名 -->
+		from
+			tbl_student
+		where
+			id = #{fdsjkafjdksafds}
+		<!-- 当一个sql语句的占位符只有一个，这个时候#{这里可以随意编写} -->
+	</select>
+	
+	<select id="getAll" resultType="com.wkcto.mybatis.domain.Student">
+		select
+			id as stuId, name as stuName, birth as stuBirth
+		from
+			tbl_student 
+	</select>
+	
+	<delete id="deleteById">
+		delete from tbl_student where id = #{fdasfdsafdsafd}
+	</delete>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

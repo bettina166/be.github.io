@@ -1,0 +1,18 @@
+1、在实际的开发中json处理包括以下几种方式：
+	第一种：使用字符串拼接方式（这种方式效率最高，容错性最差。编码太困难。）
+	第二种：使用各种插件：
+		jackson
+		jsonlib
+		fastjson
+		gson
+		....
+2、json解析包括两个方向：
+	一个是将java对象转换成json格式的字符串。
+	一个是将json格式的字符串逆转成java对象。
+	
+	java对象 <-----> json字符串
+
+3、使用jackson插件将java对象转换成json字符串两行代码搞定：
+	ObjectMapper om = new ObjectMapper();
+	String json = om.writeValueAsString(java对象);
+	

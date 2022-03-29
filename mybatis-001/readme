@@ -1,0 +1,112 @@
+开发我的第一个mybatis程序：
+
+	1、新建一个普通的java工程即可，因为mybatis框架封装了JDBC。写一个main方法即可测试。
+	
+	2、引入相关的jar包：
+		mybatis-3.4.5.jar(mybatis核心jar)
+		mysql-connector-java-5.1.23-bin.jar(mysql数据库驱动jar)
+		
+	3、从 XML 中构建 SqlSessionFactory
+		* 通过以上描述可以提取哪些信息？
+			- mybatis中一定是有一个XML文件的。
+			- mybatis中一定是有一个类叫做：SqlSessionFactory。
+			- SqlSessionFactory对象的创建以来XML文件。
+		* 编写main方法：提供一下代码
+			String resource = "org/mybatis/example/mybatis-config.xml";
+			InputStream inputStream = Resources.getResourceAsStream(resource);
+			SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+		* 通过以上代码第一行可以得出：
+			mybatis有一个配置文件叫做：mybatis-config.xml
+			mybatis-config.xml文件是存放在类路径当中的。
+			mybatis框架默认从类的根路径下作为起点开始查找资源。
+			什么是类路径？
+				bin是类的根路径。
+				eclipse当中可以看到src。（src可以等同看做类的根路径。）
+		* 在src这个类的根路径下新建一个mybatis-config.xml文件，修改main方法代码：
+			String resource = "mybatis-config.xml";
+		* 编辑mybatis-config.xml:核心配置文件主要配置连接数据库的信息，以及“sql语句配置文件”的路径。
+			<?xml version="1.0" encoding="UTF-8" ?>
+			<!DOCTYPE configuration
+			  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+			  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+			<configuration>
+				<environments default="development">
+					<environment id="development">
+						<transactionManager type="JDBC" />
+						<dataSource type="POOLED">
+							<property name="driver" value="com.mysql.jdbc.Driver" />
+							<property name="url" value="jdbc:mysql://localhost:3306/wkcto" />
+							<property name="username" value="root" />
+							<property name="password" value="root" />
+						</dataSource>
+					</environment>
+				</environments>
+				<!--通过这里的配置我们可以看出mybatis还有另一个配置文件，专门编写sql语句的-->
+				<!--该配置文件的查找路径也是从类的根路径下开始查找。-->
+				<mappers>
+					<mapper resource="org/mybatis/example/BlogMapper.xml" />
+				</mappers>
+			</configuration>
+	
+	4、提供一个配置sql语句的配置文件，通常这种文件一般都叫做：sql映射文件（SqlMapper.xml）
+	在类的根路径下新建一个SqlMapper.xml文件，修改mybatis-config.xml配置：
+		<mappers>
+			<mapper resource="SqlMapper.xml" />
+		</mappers>
+	
+	5、编辑SqlMapper.xml文件：
+		<?xml version="1.0" encoding="UTF-8" ?>
+		<!DOCTYPE mapper
+		  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+		<mapper namespace="">
+		</mapper>
+	
+	6、关于mybatis的核心API：SqlSession对象。
+		
+		SqlSession sqlSession = factory.openSession(); 开启事务
+		// 执行sql语句1
+		// 执行sql语句2
+		// ...
+		sqlSession.commit();
+		// ...
+		sqlSession.rollback();
+		// ...
+		sqlSession.close();
+	
+	7、查询所有的学生。（提前准备一个javabean：Student）
+	
+		javacode:
+			List<Student> studentList = sqlSession.selectList("getAll");
+			
+		sqlmapper.xml:
+			<select id="getAll" resultType="com.wkcto.mybatis.domain.Student">
+				select
+					id as sid, name as sname , birth as sbirth
+				from
+					tbl_student
+			</select>
+		
+		
+	
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+			
